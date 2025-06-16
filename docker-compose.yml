@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  lineageos-build:
+    build: .
+    container_name: lineageos-builder
+    volumes:
+      # Local LineageOS source directory
+      - ./lineage-sources:/home/lineage/lineage-build
+      # Build output
+      - ./build-output:/home/lineage/lineage-build/out
+      # Ccache for faster rebuilds
+      - ccache-volume:/tmp/ccache
+      # Mount local unified build repo (submodule)
+      - ./lineage_build_unified:/home/lineage/lineage-build/lineage_build_unified:ro
+      # Mount local patches repo (submodule)
+      - ./lineage_patches_unified:/home/lineage/lineage-build/lineage_patches_unified:ro
+    environment:
+      - USE_CCACHE=1
+      - CCACHE_DIR=/tmp/ccache
+    tty: true
+    stdin_open: true
+    # Uncomment to automatically start build
+    # command: ["/home/lineage/build.sh"]
+
+volumes:
+  ccache-volume:

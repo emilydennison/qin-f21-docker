@@ -1,0 +1,22 @@
+# LineageOS source directory (managed locally, not in git)
+lineage-sources/
+
+# Build outputs
+build-output/
+out/
+
+# Nix
+.direnv/
+result
+result-*
+
+# Docker
+.docker/
+
+# Temporary files
+*.tmp
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

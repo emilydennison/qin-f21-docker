@@ -1,0 +1,130 @@
+From edbb983af6d67a3f261912e31bdde5772c6e2077 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 11:16:31 +0200
+Subject: [PATCH 2/2] Launcher tweaks
+
+Change-Id: I3742fa946d455f4d77943a27f9204d0870e026ad
+---
+ .../launcher3/uioverrides/OverlayCallbackImpl.java        | 2 +-
+ res/xml/launcher_preferences.xml                          | 6 +++---
+ src/com/android/launcher3/BubbleTextView.java             | 8 ++++----
+ src/com/android/launcher3/InvariantDeviceProfile.java     | 4 +++-
+ src/com/android/launcher3/LauncherState.java              | 5 +++--
+ 5 files changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/quickstep/src/com/android/launcher3/uioverrides/OverlayCallbackImpl.java b/quickstep/src/com/android/launcher3/uioverrides/OverlayCallbackImpl.java
+index 4035e1a955..57f587b87f 100644
+--- a/quickstep/src/com/android/launcher3/uioverrides/OverlayCallbackImpl.java
++++ b/quickstep/src/com/android/launcher3/uioverrides/OverlayCallbackImpl.java
+@@ -163,7 +163,7 @@ public class OverlayCallbackImpl
+ 
+     private LauncherClient.ClientOptions getClientOptions(SharedPreferences prefs) {
+         return new LauncherClient.ClientOptions(
+-                prefs.getBoolean(KEY_ENABLE_MINUS_ONE, true),
++                prefs.getBoolean(KEY_ENABLE_MINUS_ONE, false),
+                 true, /* enableHotword */
+                 true /* enablePrewarming */
+         );
+diff --git a/res/xml/launcher_preferences.xml b/res/xml/launcher_preferences.xml
+index 83ef5b3bd2..124f52f527 100644
+--- a/res/xml/launcher_preferences.xml
++++ b/res/xml/launcher_preferences.xml
+@@ -59,7 +59,7 @@
+         launcher:logIdOff="616" />
+ 
+     <SwitchPreference
+-        android:defaultValue="true"
++        android:defaultValue="false"
+         android:key="pref_enable_minus_one"
+         android:summary="@string/pref_show_google_now_summary"
+         android:title="@string/title_show_google_app" />
+@@ -87,13 +87,13 @@
+     <SwitchPreference
+         android:key="pref_desktop_show_labels"
+         android:title="@string/desktop_show_labels"
+-        android:defaultValue="true"
++        android:defaultValue="false"
+         android:persistent="true" />
+ 
+     <SwitchPreference
+         android:key="pref_drawer_show_labels"
+         android:title="@string/drawer_show_labels"
+-        android:defaultValue="true"
++        android:defaultValue="false"
+         android:persistent="true" />
+ 
+ </androidx.preference.PreferenceScreen>
+diff --git a/src/com/android/launcher3/BubbleTextView.java b/src/com/android/launcher3/BubbleTextView.java
+index 56703855ee..151b846f06 100644
+--- a/src/com/android/launcher3/BubbleTextView.java
++++ b/src/com/android/launcher3/BubbleTextView.java
+@@ -231,7 +231,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
+             setCompoundDrawablePadding(mDeviceProfile.iconDrawablePaddingPx);
+             defaultIconSize = mDeviceProfile.iconSizePx;
+             setCenterVertically(mDeviceProfile.iconCenterVertically);
+-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
++            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, false);
+         } else if (mDisplay == DISPLAY_ALL_APPS || mDisplay == DISPLAY_PREDICTION_ROW
+                 || mDisplay == DISPLAY_SEARCH_RESULT_APP_ROW) {
+             setTextSize(TypedValue.COMPLEX_UNIT_PX, mDeviceProfile.allAppsIconTextSizePx);
+@@ -243,7 +243,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
+             setTextSize(TypedValue.COMPLEX_UNIT_PX, mDeviceProfile.folderChildTextSizePx);
+             setCompoundDrawablePadding(mDeviceProfile.folderChildDrawablePaddingPx);
+             defaultIconSize = mDeviceProfile.folderChildIconSizePx;
+-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
++            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, false);
+         } else if (mDisplay == DISPLAY_SEARCH_RESULT) {
+             setTextSize(TypedValue.COMPLEX_UNIT_PX, mDeviceProfile.allAppsIconTextSizePx);
+             defaultIconSize = getResources().getDimensionPixelSize(R.dimen.search_row_icon_size);
+@@ -251,13 +251,13 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
+         } else if (mDisplay == DISPLAY_SEARCH_RESULT_SMALL) {
+             defaultIconSize = getResources().getDimensionPixelSize(
+                     R.dimen.search_row_small_icon_size);
+-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
++            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, false);
+         } else if (mDisplay == DISPLAY_TASKBAR) {
+             defaultIconSize = mDeviceProfile.iconSizePx;
+         } else {
+             // widget_selection or shortcut_popup
+             defaultIconSize = mDeviceProfile.iconSizePx;
+-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
++            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, false);
+         }
+ 
+ 
+diff --git a/src/com/android/launcher3/InvariantDeviceProfile.java b/src/com/android/launcher3/InvariantDeviceProfile.java
+index 9cf38eee18..5278ebc1a7 100644
+--- a/src/com/android/launcher3/InvariantDeviceProfile.java
++++ b/src/com/android/launcher3/InvariantDeviceProfile.java
+@@ -718,8 +718,10 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener
+         Collections.sort(points, (a, b) ->
+                 Float.compare(dist(width, height, a.minWidthDps, a.minHeightDps),
+                         dist(width, height, b.minWidthDps, b.minHeightDps)));
+-
+         DisplayOption closestPoint = points.get(0);
++	for (DisplayOption o : points)
++	    if (o.grid.numRows == 3 && o.grid.numColumns == 3)
++	        closestPoint = o;
+         GridOption closestOption = closestPoint.grid;
+         float weights = 0;
+ 
+diff --git a/src/com/android/launcher3/LauncherState.java b/src/com/android/launcher3/LauncherState.java
+index 6e66c1448d..9e18bf2fc2 100644
+--- a/src/com/android/launcher3/LauncherState.java
++++ b/src/com/android/launcher3/LauncherState.java
+@@ -215,9 +215,10 @@ public abstract class LauncherState implements BaseState<LauncherState> {
+      * insets will be applied. As such, you can use 0 to default to this.
+      */
+     public int getFloatingSearchBarRestingMarginBottom(Launcher launcher) {
+-        DeviceProfile dp = launcher.getDeviceProfile();
++	return -1;
++/*        DeviceProfile dp = launcher.getDeviceProfile();
+         return areElementsVisible(launcher, FLOATING_SEARCH_BAR) ? dp.getQsbOffsetY()
+-                : -dp.hotseatQsbHeight;
++                : -dp.hotseatQsbHeight;*/
+     }
+ 
+     /**
+-- 
+2.34.1
+

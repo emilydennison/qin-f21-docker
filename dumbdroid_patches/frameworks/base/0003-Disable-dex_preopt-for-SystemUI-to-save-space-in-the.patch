@@ -1,0 +1,27 @@
+From 9c92633605874f353a5f4accdbf2d5c0d4dbb4c0 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 09:43:35 +0200
+Subject: [PATCH 3/6] Disable dex_preopt for SystemUI to save space in the ROM
+
+Change-Id: Id7a2ca6da9aec2773480242f8b348fb75b7e574d
+---
+ packages/SystemUI/Android.bp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/packages/SystemUI/Android.bp b/packages/SystemUI/Android.bp
+index 5ff640ee9b5f..e9755bd9a033 100644
+--- a/packages/SystemUI/Android.bp
++++ b/packages/SystemUI/Android.bp
+@@ -509,6 +509,9 @@ android_app {
+     ],
+     resource_dirs: [],
+ 
++    dex_preopt: {
++        enabled: false,
++    },
+     use_resource_processor: true,
+     platform_apis: true,
+     system_ext_specific: true,
+-- 
+2.34.1
+

@@ -1,0 +1,28 @@
+From 3e5af8576f12f2d0e90c26890370d67a61dc0768 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Tue, 10 Jun 2025 21:03:50 +0200
+Subject: [PATCH 1/6] Disable doze
+
+Change-Id: I6d40f84c418ebf377f778aa43240fb76bd85979e
+---
+ .../service/java/com/android/server/DeviceIdleController.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java b/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java
+index da1496643e11..6e3d72c8129b 100644
+--- a/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java
++++ b/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java
+@@ -2647,8 +2647,8 @@ public class DeviceIdleController extends SystemService
+         final PackageManager pm = getContext().getPackageManager();
+ 
+         synchronized (this) {
+-            mLightEnabled = mDeepEnabled = getContext().getResources().getBoolean(
+-                    com.android.internal.R.bool.config_enableAutoPowerModes);
++            mLightEnabled = mDeepEnabled = false; /*getContext().getResources().getBoolean(
++                    com.android.internal.R.bool.config_enableAutoPowerModes);*/
+             SystemConfig sysConfig = SystemConfig.getInstance();
+             ArraySet<String> allowPowerExceptIdle = sysConfig.getAllowInPowerSaveExceptIdle();
+             for (int i=0; i<allowPowerExceptIdle.size(); i++) {
+-- 
+2.34.1
+

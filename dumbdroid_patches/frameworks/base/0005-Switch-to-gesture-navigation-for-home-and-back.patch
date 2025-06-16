@@ -1,0 +1,40 @@
+From d8b9a9aa6c2e46eaffeba127c7bd7284b250e2fb Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Fri, 13 Jun 2025 08:53:52 +0200
+Subject: [PATCH 5/6] Switch to gesture navigation for home and back
+
+Change-Id: I6c98cf4e57dbad97b433dabc235bd0cf945ce52f
+---
+ core/res/res/values/config.xml                                | 2 +-
+ .../NavigationBarMode3ButtonOverlay/res/values/config.xml     | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
+index 5de740d19177..147cf046c405 100644
+--- a/core/res/res/values/config.xml
++++ b/core/res/res/values/config.xml
+@@ -4205,7 +4205,7 @@
+          0: 3 button mode (back, home, overview buttons)
+          1: 2 button mode (back, home buttons + swipe up for overview)
+          2: gestures only for back, home and overview -->
+-    <integer name="config_navBarInteractionMode">0</integer>
++    <integer name="config_navBarInteractionMode">2</integer>
+ 
+     <!-- Controls whether the nav bar can move from the bottom to the side in landscape.
+          Only applies if the device display is not square. -->
+diff --git a/packages/overlays/NavigationBarMode3ButtonOverlay/res/values/config.xml b/packages/overlays/NavigationBarMode3ButtonOverlay/res/values/config.xml
+index 7bd0a140bb1c..16dc05217b24 100644
+--- a/packages/overlays/NavigationBarMode3ButtonOverlay/res/values/config.xml
++++ b/packages/overlays/NavigationBarMode3ButtonOverlay/res/values/config.xml
+@@ -21,5 +21,5 @@
+          0: 3 button mode (back, home, overview buttons)
+          1: 2 button mode (back, home buttons + swipe up for overview)
+          2: gestures only for back, home and overview -->
+-    <integer name="config_navBarInteractionMode">0</integer>
+-</resources>
+\ No newline at end of file
++    <integer name="config_navBarInteractionMode">2</integer>
++</resources>
+-- 
+2.34.1
+

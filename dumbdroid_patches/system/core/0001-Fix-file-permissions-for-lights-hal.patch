@@ -1,0 +1,23 @@
+From 4089423caa5e94550d4b5a600eac775caba53e76 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 09:29:32 +0200
+Subject: [PATCH] Fix file permissions for lights hal
+
+Change-Id: I8fab7b8ae67c06cb60efc54f3c03ba9568ea8cdf
+---
+ rootdir/ueventd.rc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/rootdir/ueventd.rc b/rootdir/ueventd.rc
+index 39e8fe9eb..343803569 100644
+--- a/rootdir/ueventd.rc
++++ b/rootdir/ueventd.rc
+@@ -88,3 +88,5 @@ subsystem vfio
+ /sys/devices/system/cpu/cpu*   cpufreq/scaling_min_freq   0664  system system
+ /sys/devices/virtual/misc/uhid/*/leds/* brightness   0664  system system
+ /sys/devices/virtual/misc/uhid/*/leds/* multi_intensity   0664  system system
++/sys/class/leds/*  brightness    0666   system   system
++
+-- 
+2.34.1
+

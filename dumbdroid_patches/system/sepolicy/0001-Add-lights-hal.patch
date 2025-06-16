@@ -1,0 +1,25 @@
+From 36bb26eac447865ff72f828d16b6c01f5eb08e6b Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 09:26:37 +0200
+Subject: [PATCH] Add lights hal
+
+Change-Id: I893de3fe59f116da09346f5264195121f3127517
+---
+ vendor/hal_light_default.te | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/vendor/hal_light_default.te b/vendor/hal_light_default.te
+index c7fa9a1f2..7b580aaf4 100644
+--- a/vendor/hal_light_default.te
++++ b/vendor/hal_light_default.te
+@@ -1,5 +1,5 @@
+-type hal_light_default, domain;
++type hal_light_default, domain, coredomain;
+ hal_server_domain(hal_light_default, hal_light)
+ 
+-type hal_light_default_exec, exec_type, vendor_file_type, file_type;
++type hal_light_default_exec, exec_type, system_file_type, file_type;
+ init_daemon_domain(hal_light_default)
+-- 
+2.34.1
+

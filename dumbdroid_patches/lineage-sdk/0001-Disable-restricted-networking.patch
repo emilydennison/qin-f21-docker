@@ -1,0 +1,26 @@
+From b647fc7203e5dac15f6a233a5d9be93e94cd06f6 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 09:31:34 +0200
+Subject: [PATCH 1/2] Disable restricted networking
+
+Change-Id: Id6e5cab62bbdbbc88c616dbb50c2072f2502113e
+---
+ .../org/lineageos/lineagesettings/LineageDatabaseHelper.java    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/packages/LineageSettingsProvider/src/org/lineageos/lineagesettings/LineageDatabaseHelper.java b/packages/LineageSettingsProvider/src/org/lineageos/lineagesettings/LineageDatabaseHelper.java
+index ac19ea8d..d54eac3e 100644
+--- a/packages/LineageSettingsProvider/src/org/lineageos/lineagesettings/LineageDatabaseHelper.java
++++ b/packages/LineageSettingsProvider/src/org/lineageos/lineagesettings/LineageDatabaseHelper.java
+@@ -472,7 +472,7 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
+ 
+     private void loadRestrictedNetworkingModeSetting() {
+         Settings.Global.putInt(mContext.getContentResolver(),
+-                Settings.Global.RESTRICTED_NETWORKING_MODE, 1);
++                Settings.Global.RESTRICTED_NETWORKING_MODE, 0);
+     }
+ 
+     /**
+-- 
+2.34.1
+

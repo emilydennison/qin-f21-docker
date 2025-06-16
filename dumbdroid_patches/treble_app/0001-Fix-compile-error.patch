@@ -1,0 +1,28 @@
+From ed695f0bbb58dc2a260526e1f744e392f083f113 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 09:39:35 +0200
+Subject: [PATCH] Fix compile error
+
+Change-Id: Ib43ca57e00a5a2cf27be24c9fd93f38b2729aef6
+---
+ settings.gradle | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/settings.gradle b/settings.gradle
+index e7b4def..5a9f0bd 100644
+--- a/settings.gradle
++++ b/settings.gradle
+@@ -1 +1,10 @@
+ include ':app'
++-dontwarn org.bouncycastle.jsse.BCSSLParameters
++-dontwarn org.bouncycastle.jsse.BCSSLSocket
++-dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
++-dontwarn org.conscrypt.Conscrypt$Version
++-dontwarn org.conscrypt.Conscrypt
++-dontwarn org.conscrypt.ConscryptHostnameVerifier
++-dontwarn org.openjsse.javax.net.ssl.SSLParameters
++-dontwarn org.openjsse.javax.net.ssl.SSLSocket
++-dontwarn org.openjsse.net.ssl.OpenJSSE
+-- 
+2.34.1
+

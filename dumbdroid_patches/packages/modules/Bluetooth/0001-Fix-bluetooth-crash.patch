@@ -1,0 +1,26 @@
+From 85b2764928e128428edf31452232dbd742d68a9b Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 09:39:08 +0200
+Subject: [PATCH] Fix bluetooth crash
+
+Change-Id: I59a64cd8d03850a98ceff7757e4a196e181271cc
+---
+ system/main/shim/hci_layer.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/system/main/shim/hci_layer.cc b/system/main/shim/hci_layer.cc
+index e14e106efa..f5f3c55316 100644
+--- a/system/main/shim/hci_layer.cc
++++ b/system/main/shim/hci_layer.cc
+@@ -175,6 +175,8 @@ static void vendor_specific_event_callback(
+ void OnTransmitPacketCommandComplete(command_complete_cb complete_callback,
+                                      void* context,
+                                      bluetooth::hci::CommandCompleteView view) {
++  if (!view.IsValid())
++	  return;
+   LOG_DEBUG("Received cmd complete for %s",
+             bluetooth::hci::OpCodeText(view.GetCommandOpCode()).c_str());
+   BT_HDR* response = WrapPacketAndCopy(MSG_HC_TO_STACK_HCI_EVT, &view);
+-- 
+2.34.1
+

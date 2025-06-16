@@ -1,0 +1,200 @@
+From 1d56dc275eec7f439b06b3c96a5db56c66e56c7e Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Wed, 11 Jun 2025 09:36:58 +0200
+Subject: [PATCH] Add dpad volume control settings
+
+Change-Id: I687adb90b76ce495742ff09fd01eacd48a269e67
+---
+ res/values/arrays.xml                         | 10 ++++
+ res/values/strings.xml                        |  6 +++
+ res/xml/button_settings.xml                   | 28 +++++++++++
+ .../lineageparts/input/ButtonSettings.java    | 47 +++++++++++++++++++
+ 4 files changed, 91 insertions(+)
+
+diff --git a/res/values/arrays.xml b/res/values/arrays.xml
+index 265ca28..4649977 100644
+--- a/res/values/arrays.xml
++++ b/res/values/arrays.xml
+@@ -89,6 +89,16 @@
+         <item>10</item>
+     </string-array>
+ 
++    <string-array name="dpad_action_entries" translatable="false">
++        <item>@string/hardware_keys_action_nothing</item>
++        <item>@string/dpad_action_volume</item>
++    </string-array>
++
++    <string-array name="dpad_action_values" translatable="false">
++        <item>0</item>
++        <item>1</item>
++    </string-array>
++
+     <!-- Volume key cursor control -->
+     <string-array name="volbtn_cursor_control_entries" translatable="false">
+         <item>@string/volbtn_cursor_control_off</item>
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index f7b3916..5fc26cc 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -178,6 +178,10 @@
+     <string name="button_pref_title">Buttons</string>
+     <string name="hardware_keys_power_key_title">Power button</string>
+     <string name="hardware_keys_home_key_title">Home button</string>
++    <string name="hardware_keys_dpad_key_title">Dpad up/down buttons</string>
++    <string name="dpad_screen_off_action_title">While the screen is off</string>
++    <string name="dpad_music_playing_action_title">While media is playing</string>
++    <string name="dpad_call_active_action_title">While a call is active</string>
+     <string name="hardware_keys_back_key_title">Back button</string>
+     <string name="hardware_keys_menu_key_title">Menu button</string>
+     <string name="hardware_keys_assist_key_title">Search button</string>
+@@ -198,6 +202,7 @@
+     <string name="hardware_keys_action_last_app">Last app</string>
+     <string name="hardware_keys_action_split_screen">Split screen</string>
+     <string name="hardware_keys_action_kill_app">Kill foreground app</string>
++    <string name="dpad_action_volume">Change volume</string>
+     <string name="camera_sleep_on_release_title">Screen peek</string>
+     <string name="camera_sleep_on_release_summary">A half press will keep the screen on only while the button is held down</string>
+     <string name="camera_launch_title">Launch camera</string>
+@@ -256,6 +261,7 @@
+     <string name="navigation_bar_back_long_press_title">Back long press action</string>
+     <string name="navigation_bar_home_long_press_title">Home long press action</string>
+     <string name="navigation_bar_home_double_tap_title">Home double tap action</string>
++    <!--<string name="navigation_bar_dpad_long_press_title">Dpad up/down long press action</string>-->
+     <string name="navigation_bar_app_switch_long_press_title">Recents long press action</string>
+     <string name="navigation_bar_edge_long_swipe_title">Edge long swipe action</string>
+ 
+diff --git a/res/xml/button_settings.xml b/res/xml/button_settings.xml
+index 99e1af8..4e6bde2 100644
+--- a/res/xml/button_settings.xml
++++ b/res/xml/button_settings.xml
+@@ -156,6 +156,34 @@
+ 
+     </PreferenceCategory>
+ 
++    <PreferenceCategory
++        android:key="dpad_key"
++        android:title="@string/hardware_keys_dpad_key_title" >
++
++        <ListPreference
++            android:key="hardware_keys_dpad_screen_off"
++            android:dialogTitle="@string/dpad_screen_off_action_title"
++            android:title="@string/dpad_screen_off_action_title"
++            android:entries="@array/dpad_action_entries"
++            android:entryValues="@array/dpad_action_values"
++            android:persistent="false" />
++        <ListPreference
++            android:key="hardware_keys_dpad_music_playing"
++            android:dialogTitle="@string/dpad_music_playing_action_title"
++            android:title="@string/dpad_music_playing_action_title"
++            android:entries="@array/dpad_action_entries"
++            android:entryValues="@array/dpad_action_values"
++            android:persistent="false" />
++        <ListPreference
++            android:key="hardware_keys_dpad_call_active"
++            android:dialogTitle="@string/dpad_call_active_action_title"
++            android:title="@string/dpad_call_active_action_title"
++            android:entries="@array/dpad_action_entries"
++            android:entryValues="@array/dpad_action_values"
++            android:persistent="false" />
++
++    </PreferenceCategory>
++
+     <PreferenceCategory
+         android:key="back_key"
+         android:title="@string/hardware_keys_back_key_title" >
+diff --git a/src/org/lineageos/lineageparts/input/ButtonSettings.java b/src/org/lineageos/lineageparts/input/ButtonSettings.java
+index 473ef40..2c42469 100644
+--- a/src/org/lineageos/lineageparts/input/ButtonSettings.java
++++ b/src/org/lineageos/lineageparts/input/ButtonSettings.java
+@@ -67,6 +67,9 @@ public class ButtonSettings extends SettingsPreferenceFragment
+     private static final String KEY_HOME_LONG_PRESS = "hardware_keys_home_long_press";
+     private static final String KEY_HOME_DOUBLE_TAP = "hardware_keys_home_double_tap";
+     private static final String KEY_HOME_WAKE_SCREEN = "home_wake_screen";
++    private static final String KEY_DPAD_SCREEN_OFF = "hardware_keys_dpad_screen_off";
++    private static final String KEY_DPAD_MUSIC_PLAYING = "hardware_keys_dpad_music_playing";
++    private static final String KEY_DPAD_CALL_ACTIVE = "hardware_keys_dpad_call_active";
+     private static final String KEY_MENU_PRESS = "hardware_keys_menu_press";
+     private static final String KEY_MENU_LONG_PRESS = "hardware_keys_menu_long_press";
+     private static final String KEY_MENU_WAKE_SCREEN = "menu_wake_screen";
+@@ -116,6 +119,9 @@ public class ButtonSettings extends SettingsPreferenceFragment
+     private ListPreference mBackLongPressAction;
+     private ListPreference mHomeLongPressAction;
+     private ListPreference mHomeDoubleTapAction;
++    private ListPreference mDpadScreenOffAction;
++    private ListPreference mDpadMusicPlayingAction;
++    private ListPreference mDpadCallActiveAction;
+     private ListPreference mMenuPressAction;
+     private ListPreference mMenuLongPressAction;
+     private ListPreference mAssistPressAction;
+@@ -213,6 +219,12 @@ public class ButtonSettings extends SettingsPreferenceFragment
+                 org.lineageos.platform.internal.R.integer.config_longPressOnHomeBehavior));
+         Action defaultHomeDoubleTapAction = Action.fromIntSafe(res.getInteger(
+                 org.lineageos.platform.internal.R.integer.config_doubleTapOnHomeBehavior));
++        Action defaultDpadScreenOffAction = Action.fromIntSafe(res.getInteger(
++                org.lineageos.platform.internal.R.integer.config_screenOffDpadBehavior));
++        Action defaultDpadMusicPlayingAction = Action.fromIntSafe(res.getInteger(
++                org.lineageos.platform.internal.R.integer.config_musicPlayingDpadBehavior));
++        Action defaultDpadCallActiveAction = Action.fromIntSafe(res.getInteger(
++                org.lineageos.platform.internal.R.integer.config_callActiveDpadBehavior));
+         Action defaultAppSwitchLongPressAction = Action.fromIntSafe(res.getInteger(
+                 org.lineageos.platform.internal.R.integer.config_longPressOnAppSwitchBehavior));
+         Action backLongPressAction = Action.fromSettings(resolver,
+@@ -224,6 +236,15 @@ public class ButtonSettings extends SettingsPreferenceFragment
+         Action homeDoubleTapAction = Action.fromSettings(resolver,
+                 LineageSettings.System.KEY_HOME_DOUBLE_TAP_ACTION,
+                 defaultHomeDoubleTapAction);
++        Action dpadScreenOffAction = Action.fromSettings(resolver,
++                LineageSettings.System.KEY_DPAD_SCREEN_OFF_ACTION,
++                defaultDpadScreenOffAction);
++        Action dpadMusicPlayingAction = Action.fromSettings(resolver,
++                LineageSettings.System.KEY_DPAD_MUSIC_PLAYING_ACTION,
++                defaultDpadMusicPlayingAction);
++        Action dpadCallActiveAction = Action.fromSettings(resolver,
++                LineageSettings.System.KEY_DPAD_CALL_ACTIVE_ACTION,
++                defaultDpadCallActiveAction);
+         Action appSwitchLongPressAction = Action.fromSettings(resolver,
+                 LineageSettings.System.KEY_APP_SWITCH_LONG_PRESS_ACTION,
+                 defaultAppSwitchLongPressAction);
+@@ -542,6 +563,20 @@ public class ButtonSettings extends SettingsPreferenceFragment
+ 
+         mEdgeLongSwipeAction.setEntries(actionEntries);
+         mEdgeLongSwipeAction.setEntryValues(actionValues);
++
++	mDpadScreenOffAction = initList(KEY_DPAD_SCREEN_OFF, dpadScreenOffAction);
++	mDpadMusicPlayingAction = initList(KEY_DPAD_MUSIC_PLAYING, dpadMusicPlayingAction);
++	mDpadCallActiveAction = initList(KEY_DPAD_CALL_ACTIVE, dpadCallActiveAction);
++        List<String> dpadEntries = new ArrayList<>(
++                Arrays.asList(res.getStringArray(R.array.dpad_action_entries)));
++        List<String> dpadValues = new ArrayList<>(
++                Arrays.asList(res.getStringArray(R.array.dpad_action_values)));
++        mDpadScreenOffAction.setEntries(dpadEntries.toArray(new String[0]));
++        mDpadScreenOffAction.setEntryValues(dpadValues.toArray(new String[0]));
++        mDpadMusicPlayingAction.setEntries(dpadEntries.toArray(new String[0]));
++        mDpadMusicPlayingAction.setEntryValues(dpadValues.toArray(new String[0]));
++        mDpadCallActiveAction.setEntries(dpadEntries.toArray(new String[0]));
++        mDpadCallActiveAction.setEntryValues(dpadValues.toArray(new String[0]));
+     }
+ 
+     @Override
+@@ -608,6 +643,18 @@ public class ButtonSettings extends SettingsPreferenceFragment
+             handleListChange((ListPreference) preference, newValue,
+                     LineageSettings.System.KEY_HOME_LONG_PRESS_ACTION);
+             return true;
++        } else if (preference == mDpadScreenOffAction) {
++            handleListChange((ListPreference) preference, newValue,
++                    LineageSettings.System.KEY_DPAD_SCREEN_OFF_ACTION);
++            return true;
++        } else if (preference == mDpadMusicPlayingAction) {
++            handleListChange((ListPreference) preference, newValue,
++                    LineageSettings.System.KEY_DPAD_MUSIC_PLAYING_ACTION);
++            return true;
++        } else if (preference == mDpadCallActiveAction) {
++            handleListChange((ListPreference) preference, newValue,
++                    LineageSettings.System.KEY_DPAD_CALL_ACTIVE_ACTION);
++            return true;
+         } else if (preference == mHomeDoubleTapAction ||
+                 preference == mNavigationHomeDoubleTapAction) {
+             handleListChange((ListPreference) preference, newValue,
+-- 
+2.34.1
+

@@ -1,0 +1,74 @@
+From d4f0b119b7e244cebfc613245720f5baa5cea377 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Fri, 13 Jun 2025 08:57:47 +0200
+Subject: [PATCH 6/6] Fix lock screen crashing
+
+Change-Id: Ia46388d4970ba7c89fff55c6d2c1fabd487a4757
+---
+ .../server/locksettings/LockSettingsService.java | 16 +++++++++++++---
+ .../locksettings/SyntheticPasswordManager.java   |  6 ++----
+ 2 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/services/core/java/com/android/server/locksettings/LockSettingsService.java b/services/core/java/com/android/server/locksettings/LockSettingsService.java
+index d235a76bb707..b70f3b823968 100644
+--- a/services/core/java/com/android/server/locksettings/LockSettingsService.java
++++ b/services/core/java/com/android/server/locksettings/LockSettingsService.java
+@@ -2305,6 +2305,10 @@ public class LockSettingsService extends ILockSettings.Stub {
+         }
+     }
+ 
++    private SyntheticPassword reconstructSP(int userId) {
++        return SyntheticPasswordManager.SyntheticPassword.create();
++    }
++
+     /**
+      * Verify user credential and unlock the user.
+      * @param credential User's lockscreen credential
+@@ -2330,7 +2334,7 @@ public class LockSettingsService extends ILockSettings.Stub {
+         }
+         Slogf.i(TAG, "Verifying lockscreen credential for user %d", userId);
+ 
+-        final AuthenticationResult authResult;
++        AuthenticationResult authResult;
+         VerifyCredentialResponse response;
+ 
+         synchronized (mSpManager) {
+@@ -2345,10 +2349,16 @@ public class LockSettingsService extends ILockSettings.Stub {
+             }
+ 
+             long protectorId = getCurrentLskfBasedProtectorId(userId);
+-            authResult = mSpManager.unlockLskfBasedProtector(
++            try {
++                authResult = mSpManager.unlockLskfBasedProtector(
+                     getGateKeeperService(), protectorId, credential, userId, progressCallback);
++            } catch (Exception e) {
++                Slog.w(TAG, "Keystore2 unwrap failed, continuing with software SP", e);
++                authResult = new AuthenticationResult();
++                authResult.gkResponse = VerifyCredentialResponse.OK;
++                authResult.syntheticPassword = reconstructSP(userId);
++            }
+             response = authResult.gkResponse;
+-
+             if (response.getResponseCode() == VerifyCredentialResponse.RESPONSE_OK) {
+                 if ((flags & VERIFY_FLAG_WRITE_REPAIR_MODE_PW) != 0) {
+                     if (!mSpManager.writeRepairModeCredentialLocked(protectorId, userId)) {
+diff --git a/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java b/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java
+index cc58f38db65a..53d463096d96 100644
+--- a/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java
++++ b/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java
+@@ -305,10 +305,8 @@ class SyntheticPasswordManager {
+          */
+         static SyntheticPassword create() {
+             SyntheticPassword result = new SyntheticPassword(SYNTHETIC_PASSWORD_VERSION_V3);
+-            byte[] escrowSplit0 =
+-                    SecureRandomUtils.randomBytes(SYNTHETIC_PASSWORD_SECURITY_STRENGTH);
+-            byte[] escrowSplit1 =
+-                    SecureRandomUtils.randomBytes(SYNTHETIC_PASSWORD_SECURITY_STRENGTH);
++            byte[] escrowSplit0 = new byte[SYNTHETIC_PASSWORD_SECURITY_STRENGTH];
++            byte[] escrowSplit1 = new byte[SYNTHETIC_PASSWORD_SECURITY_STRENGTH];
+             result.recreate(escrowSplit0, escrowSplit1);
+             byte[] encrypteEscrowSplit0 = SyntheticPasswordCrypto.encrypt(result.mSyntheticPassword,
+                     PERSONALIZATION_E0, escrowSplit0);
+-- 
+2.34.1
+

@@ -1,0 +1,23 @@
+From b6c60ff6e63148b498b340cc31daff55ba82ef04 Mon Sep 17 00:00:00 2001
+From: Michal Brzozowski <miki@extremic.com>
+Date: Tue, 10 Jun 2025 21:01:14 +0200
+Subject: [PATCH] Add lights hal binary
+
+Change-Id: I7be2a13f73d92d8705506223d45eded13085403e
+---
+ common/private/file_contexts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/common/private/file_contexts b/common/private/file_contexts
+index a441605..52ccd00 100644
+--- a/common/private/file_contexts
++++ b/common/private/file_contexts
+@@ -18,3 +18,5 @@
+ 
+ # Bash
+ /(system_ext|system/system_ext)/bin/bash          u:object_r:shell_exec:s0
++
++/system/bin/hw/android\.hardware\.lights-service\.example    u:object_r:hal_light_default_exec:s0
+-- 
+2.34.1
+
