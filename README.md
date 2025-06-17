@@ -31,13 +31,30 @@ git submodule update --init --recursive
 ```bash
 docker-compose build
 ```
+### 3. Install `repo` tool:
+The `repo` tool is required to initialize and sync LineageOS sources.
 
-### 3. Initialize LineageOS sources:
+```bash
+mkdir -p ~/bin
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+export PATH=~/bin:$PATH
+```
+
+To make the `repo` tool available permanently, add the following line to your shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.):
+
+```bash
+export PATH=~/bin:$PATH
+```
+
+### 4. Initialize LineageOS sources:
+
 ```bash
 ./scripts/setup-sources.sh
 ```
 
-### 4. Apply custom patches:
+### 5. Apply custom patches:
+
 ```bash
 ./scripts/apply-patches.sh
 ```
