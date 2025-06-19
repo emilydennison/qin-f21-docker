@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+# Get the script directory and repository root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 echo "Applying dumbdroid patches to LineageOS sources..."
+echo "Repository root: $REPO_ROOT"
+
+# Change to repository root
+cd "$REPO_ROOT"
 
 # Check if lineage-sources directory exists
 if [ ! -d "lineage-sources" ]; then
@@ -24,36 +32,61 @@ if [ -f ".patches_applied" ]; then
 fi
 
 # Apply dumbdroid patches
-if [ -d "../dumbdroid_patches" ]; then
+if [ -d "$REPO_ROOT/dumbdroid_patches" ]; then
     echo "Applying dumbdroid patches..."
     
-    find ../dumbdroid_patches -name "*.patch" | while read patch; do
+    find "$REPO_ROOT/dumbdroid_patches" -name "*.patch" | while read patch; do
         # Extract target path from patch location
-        target_dir=$(dirname "$patch" | sed 's|^../dumbdroid_patches/||')
+        target_dir=$(dirname "$patch" | sed "s|^$REPO_ROOT/dumbdroid_patches/||")
+        
+        echo "Processing patch: $patch"
+        echo "Target directory: $target_dir"
         
         if [ -d "$target_dir" ]; then
-            echo "Applying $patch to $target_dir"
-            cd "$target_dir"
+            echo "✅ Target directory exists: $target_dir"
             
-            # Create a git branch for tracking patches if this is the first patch for this directory
-            if ! git branch | grep -q "dumbdroid-patches"; then
-                git checkout -b dumbdroid-patches 2>/dev/null || git checkout dumbdroid-patches
-            fi
-            
-            # Apply the patch
-            if git apply "$patch"; then
-                echo "Successfully applied $patch"
-                # Commit the patch
-                git add -A
-                git commit -m "Apply $(basename "$patch")" || echo "Nothing to commit for $patch"
+            # Check if this is a git repository
+            if [ -d "$target_dir/.git" ]; then
+                echo "✅ Git repository found in $target_dir"
+                cd "$target_dir"
+                
+                # Show current git status
+                echo "Current git status in $target_dir:"
+                git status --porcelain | head -3
+                
+                # Reset to clean state if there are uncommitted changes
+                if ! git diff-index --quiet HEAD --; then
+                    echo "⚠️  Uncommitted changes found, resetting to clean state"
+                    git reset --hard HEAD
+                fi
+                
+                # Apply the patch with 3-way merge to handle conflicts better
+                echo "Applying patch: $(basename "$patch")"
+                if git apply --3way "$patch"; then
+                    echo "✅ Successfully applied $patch"
+                    
+                    # Show what changed
+                    git diff --name-only HEAD
+                    
+                    # Add and commit changes
+                    git add -A
+                    if git commit -m "Apply $(basename "$patch")"; then
+                        echo "✅ Committed changes for $(basename "$patch")"
+                    else
+                        echo "⚠️  No changes to commit for $(basename "$patch")"
+                    fi
+                else
+                    echo "❌ Failed to apply $patch"
+                fi
+                
+                cd - > /dev/null
             else
-                echo "Failed to apply $patch"
+                echo "❌ No git repository in $target_dir"
             fi
-            
-            cd - > /dev/null
         else
-            echo "Target directory $target_dir does not exist for patch $patch"
+            echo "❌ Target directory $target_dir does not exist"
         fi
+        echo "---"
     done
     
     # Mark patches as applied
@@ -63,5 +96,5 @@ else
     echo "No dumbdroid_patches directory found"
 fi
 
-cd ..
+cd "$REPO_ROOT"
 echo "Patch application complete!"
