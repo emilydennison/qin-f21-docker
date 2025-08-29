@@ -45,6 +45,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     wget \
     unzip \
+    sudo \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Install repo command
@@ -83,7 +85,7 @@ RUN echo '#!/bin/bash' > /home/$USER/build.sh && \
     echo '    exit 1' >> /home/$USER/build.sh && \
     echo 'fi' >> /home/$USER/build.sh && \
     echo '# Run the unified build script' >> /home/$USER/build.sh && \
-    echo 'bash lineage_build_unified/build_unified.sh treble 64VN 64GN' >> /home/$USER/build.sh && \
+    echo 'bash lineage_build_unified/buildbot_unified.sh treble 64VN 64GN' >> /home/$USER/build.sh && \
     chmod +x /home/$USER/build.sh
 
 # Default command

@@ -12,9 +12,9 @@ services:
       # Ccache for faster rebuilds
       - ccache-volume:/tmp/ccache
       # Mount local unified build repo (submodule)
-      - ./lineage_build_unified:/home/lineage/lineage-build/lineage_build_unified:ro
+      - ./lineage_build_unified:/home/lineage/lineage-build/lineage_build_unified
       # Mount local patches repo (submodule)
-      - ./lineage_patches_unified:/home/lineage/lineage-build/lineage_patches_unified:ro
+      - ./lineage_patches_unified:/home/lineage/lineage-build/lineage_patches_unified
     environment:
       - USE_CCACHE=1
       - CCACHE_DIR=/tmp/ccache
@@ -22,6 +22,11 @@ services:
     stdin_open: true
     # Uncomment to automatically start build
     # command: ["/home/lineage/build.sh"]
+    deploy:
+      resources:
+        limits:
+          memory: 16G
+    memswap_limit: 64G
 
 volumes:
   ccache-volume:
