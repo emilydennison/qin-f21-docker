@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     sudo \
-    vim \
+    nano \
     default-jre \
     default-jdk \
     libncurses5 \
@@ -87,6 +87,8 @@ RUN echo '#!/bin/bash' > /home/$USER/build.sh && \
     echo '    echo "Error: LineageOS sources not found. Please run setup-sources.sh on host first."' >> /home/$USER/build.sh && \
     echo '    exit 1' >> /home/$USER/build.sh && \
     echo 'fi' >> /home/$USER/build.sh && \
+    echo '# Fix permissions in the build repo' >> /home/$USER/build.sh && \
+    echo 'sudo chmod -R $USER /home/$USER/lineage-build' >> /home/$USER/build.sh && \
     echo '# Run the unified build script' >> /home/$USER/build.sh && \
     echo 'bash lineage_build_unified/buildbot_unified.sh treble 64VN 64GN' >> /home/$USER/build.sh && \
     chmod +x /home/$USER/build.sh
