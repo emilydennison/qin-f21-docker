@@ -95,7 +95,6 @@ RUN echo '#!/bin/bash' > /home/$USER/build.sh && \
 
 # Fix permissions on directories so it's owned by lineage and not the 1001 user
 
-RUN sudo chown -R lineage ~/lineage_build_unified
 
 # Default command
 CMD ["/bin/bash"]
