@@ -1,8 +1,8 @@
 [submodule "lineage_build_unified"]
 	path = lineage_build_unified
 	url = git@github.com:AndyCGYan/lineage_build_unified.git
-	branch = lineage-21-td
+	branch = lineage-21-pre-qpr2-td
 [submodule "lineage_patches_unified"]
 	path = lineage_patches_unified
 	url = https://github.com/AndyCGYan/lineage_patches_unified.git
-	branch = lineage-21-td
+	branch = lineage-21-pre-qpr2-td

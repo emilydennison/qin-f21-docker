@@ -47,6 +47,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     sudo \
     vim \
+    default-jre \
+    default-jdk \
+    libncurses5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install repo command
@@ -87,6 +90,10 @@ RUN echo '#!/bin/bash' > /home/$USER/build.sh && \
     echo '# Run the unified build script' >> /home/$USER/build.sh && \
     echo 'bash lineage_build_unified/buildbot_unified.sh treble 64VN 64GN' >> /home/$USER/build.sh && \
     chmod +x /home/$USER/build.sh
+
+# Fix permissions on directories so it's owned by lineage and not the 1001 user
+
+RUN sudo chown -R lineage ~/lineage_build_unified
 
 # Default command
 CMD ["/bin/bash"]
